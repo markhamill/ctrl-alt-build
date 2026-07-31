@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  /* Custom background colors */
+  --color-brutal-bg: #0a0a0a;
+  --color-brutal-panel: #141414;
+  
+  /* The core brand accents */
+  --color-brand-orange: #ff4a00;
+  --color-brand-green: #00ff66;
+  
+  /* Setting a global monospace font for that terminal/dashboard feel */
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Force dark mode background globally */
+body {
+  background-color: var(--color-brutal-bg);
+  color: white;
+}
