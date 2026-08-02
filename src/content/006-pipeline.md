@@ -1,7 +1,7 @@
 ---
 id: "006"
 date: "2026-08-02"
-category: "ARCHITECTURE"
+category: "BUILD"
 title: "Wrestling the DOM: Flexbox, Regex, and SPA Routing"
 excerpt: "Polishing the brutalist UI. A practical look at forcing horizontal layouts, stripping markdown duplicates, fixing classic React routing quirks, and responsive typography."
 readTime: "5 min read"

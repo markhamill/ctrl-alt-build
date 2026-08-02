@@ -39,7 +39,11 @@ export default function App() {
         loadedPosts.push({ attributes, body, slug })
       }
 
-      loadedPosts.sort((a, b) => new Date(b.attributes.date).getTime() - new Date(a.attributes.date).getTime())
+      loadedPosts.sort((a, b) => {
+        const dateDiff = new Date(b.attributes.date).getTime() - new Date(a.attributes.date).getTime()
+        if (dateDiff !== 0) return dateDiff
+        return b.attributes.id.localeCompare(a.attributes.id, undefined, { numeric: true })
+      })
       setPosts(loadedPosts)
     }
 
@@ -230,20 +234,21 @@ export default function App() {
                 onClick={() => window.location.hash = `dispatch-${post.slug}`}
                 className="group border border-gray-800/80 bg-brutal-panel p-6 rounded-none hover:border-brand-orange/50 transition-all duration-200 cursor-pointer"
               >
-                <div className="flex justify-between items-center text-xs text-gray-500 mb-3">
+                <div className="text-xs mb-3">
                   <span className="text-brand-orange font-semibold tracking-wider">
                     [{post.attributes.category}]
                   </span>
-                  <div className="flex gap-4">
-                    <span>{post.attributes.date}</span>
-                    <span>·</span>
-                    <span>{post.attributes.readTime}</span>
-                  </div>
                 </div>
 
-                <h2 className="text-2xl font-bold text-white group-hover:text-brand-orange transition-colors mb-3">
+                <h2 className="text-2xl font-bold text-white group-hover:text-brand-orange transition-colors mb-2">
                   {post.attributes.title}
                 </h2>
+
+                <div className="flex gap-4 text-xs text-gray-500 mb-3">
+                  <span>{post.attributes.date}</span>
+                  <span>·</span>
+                  <span>{post.attributes.readTime}</span>
+                </div>
 
                 <p className="text-gray-400 text-sm leading-relaxed mb-4">
                   {post.attributes.excerpt}

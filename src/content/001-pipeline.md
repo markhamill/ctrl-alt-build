@@ -1,6 +1,6 @@
 ---
 id: "001"
-date: "2026-07-31"
+date: "2026-07-29"
 category: "DAILY BLOG"
 title: "Wiring The Workspace"
 excerpt: "Learn by Building. Approaching Job Searching In An AI World By Learning All The Things"

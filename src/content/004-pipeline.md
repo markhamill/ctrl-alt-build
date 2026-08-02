@@ -5,6 +5,7 @@ category: "BUILD"
 title: "Zero to Live: Establishing the Build Log"
 excerpt: "A quick, high-level overview of how this web app went from a blank terminal to a live, hosted URL in a single evening."
 readTime: "2 min read"
+tags: ["architecture", "github-pages", "content-engine"]
 ---
 
 # From Concept to Live Server

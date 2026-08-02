@@ -1,6 +1,6 @@
 ---
 id: "003"
-date: "2026-07-30"
+date: "2026-07-31"
 category: "DAILY BLOG"
 title: "Burning the Boats and Rebuilding the Scaffolding"
 excerpt: "Errors, Both Human and AI Are All Part of The Process"

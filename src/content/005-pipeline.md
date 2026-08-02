@@ -1,10 +1,11 @@
 ---
 id: "005"
 date: "2026-08-01"
-category: "TECHNICAL BLOG"
+category: "BUILD"
 title: "The Happy Idiot's Guide to Modern Web Deployment"
 excerpt: "How I fumbled my way through Vite, React, and GitHub Pages, asking all the dumb questions so you don't have to."
 readTime: "6 min read"
+tags: ["vite", "react", "tailwindcss", "github-pages", "github-actions"]
 ---
 
 # The Happy Idiot's Guide to Modern Web Deployment
