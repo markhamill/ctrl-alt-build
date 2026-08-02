@@ -9,7 +9,7 @@ interface PostAttributes {
   title: string
   excerpt: string
   readTime: string
-  tags?: string[] // NEW: Optional tags array
+  tags?: string[]
 }
 
 interface Post {
@@ -23,7 +23,7 @@ export default function App() {
   const [posts, setPosts] = useState<Post[]>([])
   const [selectedPost, setSelectedPost] = useState<Post | null>(null)
 
-  // 1. The Markdown Pipeline (No changes here)
+  // 1. The Markdown Pipeline
   useEffect(() => {
     const loadPosts = async () => {
       const files = import.meta.glob('/src/content/*.md', { query: '?raw', import: 'default' })
@@ -32,7 +32,10 @@ export default function App() {
       for (const path in files) {
         const rawMarkdown = await files[path]() as string
         const { attributes, body } = frontMatter<PostAttributes>(rawMarkdown)
-        const slug = path.split('/').pop()?.replace('.md', '') || ''
+        
+        // NEW: Use the clean ID from the YAML frontmatter instead of the local filename
+        const slug = attributes.id 
+        
         loadedPosts.push({ attributes, body, slug })
       }
 
@@ -43,14 +46,13 @@ export default function App() {
     loadPosts()
   }, [])
 
-  // 2. NEW: Hash Routing Engine
+  // 2. Hash Routing Engine
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash
       
       if (hash.startsWith('#dispatch-')) {
         const slug = hash.replace('#dispatch-', '')
-        // Find the post matching the URL slug
         const post = posts.find(p => p.slug === slug)
         if (post) {
           setSelectedPost(post)
@@ -60,29 +62,35 @@ export default function App() {
         setSelectedPost(null)
         setActiveTab('about')
       } else {
-        // Default back to the main feed if hash is empty or unrecognized
         setSelectedPost(null)
         setActiveTab('dispatches')
       }
     }
 
-    // Run once when posts load (this allows direct linking/bookmarking to work)
     handleHashChange()
-
-    // Listen for the physical browser Back/Forward clicks
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [posts])
 
+  // 3. NEW: Auto-Scroll to Top on Navigation
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [selectedPost, activeTab])
+
+  // Find adjacent posts for navigation
+  const currentIndex = selectedPost ? posts.findIndex(p => p.slug === selectedPost.slug) : -1
+  const newerPost = currentIndex > 0 ? posts[currentIndex - 1] : null
+  const olderPost = currentIndex !== -1 && currentIndex < posts.length - 1 ? posts[currentIndex + 1] : null
+
   return (
     <div className="min-h-screen bg-brutal-bg text-gray-200 font-mono p-6 md:p-12 selection:bg-brand-orange selection:text-white max-w-5xl mx-auto">
       
+      {/* GLOBAL HEADER */}
       <header className="border-b border-gray-800 pb-6 mb-8 flex justify-between items-end">
         <div>
           <p className="text-gray-500 text-xs tracking-widest uppercase mb-2">
-            Dispatches from the Algo-Economy · Est. Jul 2026
+            Dispatches from a journey of job searching in the AI era · Est. Jul 2026
           </p>
-          {/* Action updated to clear the hash */}
           <h1 className="text-5xl md:text-7xl font-black tracking-tighter cursor-pointer" onClick={() => window.location.hash = ''}>
             CTRL+ALT+<span className="text-brand-orange">BUILD</span>
           </h1>
@@ -96,19 +104,38 @@ export default function App() {
         </div>
       </header>
 
+{/* NAVIGATION */}
       {selectedPost ? (
-        <nav className="flex gap-6 border-b border-gray-800/80 pb-4 mb-8 text-xs tracking-widest uppercase">
-          {/* Action updated to clear the hash */}
+        <nav className="flex justify-between border-b border-gray-800/80 pb-4 mb-8 text-xs tracking-widest uppercase">
           <button 
             onClick={() => window.location.hash = ''}
             className="text-gray-400 hover:text-brand-orange transition-colors flex items-center gap-2"
           >
             ← RETURN TO FEED
           </button>
+          
+          {/* NEXT / PREVIOUS ARROWS */}
+          <div className="flex gap-6 font-bold">
+            <button 
+              onClick={() => newerPost && (window.location.hash = `dispatch-${newerPost.slug}`)}
+              disabled={!newerPost}
+              className={`flex items-center transition-colors ${newerPost ? 'text-brand-orange/60 hover:text-brand-orange cursor-pointer' : 'text-gray-800 cursor-default'}`}
+              title={newerPost ? "Newer Dispatch" : ""}
+            >
+              NEWER ↑
+            </button>
+            <button 
+              onClick={() => olderPost && (window.location.hash = `dispatch-${olderPost.slug}`)}
+              disabled={!olderPost}
+              className={`flex items-center transition-colors ${olderPost ? 'text-brand-orange/60 hover:text-brand-orange cursor-pointer' : 'text-gray-800 cursor-default'}`}
+              title={olderPost ? "Older Dispatch" : ""}
+            >
+              OLDER ↓
+            </button>
+          </div>
         </nav>
       ) : (
         <nav className="flex gap-6 border-b border-gray-800/80 pb-4 mb-8 text-xs tracking-widest uppercase">
-          {/* Actions updated to set specific hashes */}
           <button 
             onClick={() => window.location.hash = ''}
             className={`transition-colors ${activeTab === 'dispatches' ? 'text-brand-orange font-bold border-b-2 border-brand-orange pb-4 -mb-4' : 'text-gray-500 hover:text-gray-300'}`}
@@ -124,11 +151,14 @@ export default function App() {
         </nav>
       )}
 
+      {/* MAIN CONTENT AREA */}
       <main>
         {selectedPost ? (
           <article className="border border-gray-800/80 bg-brutal-panel p-8 md:p-12 rounded-none">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-8 pb-8 border-b border-gray-800">
-              <div>
+            <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-8 mb-8 pb-8 border-b border-gray-800">
+              
+              {/* LEFT SIDE: Category and Title */}
+              <div className="max-w-3xl">
                 <span className="text-brand-orange font-semibold tracking-wider text-sm mb-4 block">
                   [{selectedPost.attributes.category}]
                 </span>
@@ -137,9 +167,19 @@ export default function App() {
                 </h1>
               </div>
 
-                {/* NEW: Render Tags in Article Header */}
+              {/* RIGHT SIDE: Meta Info (Date and Tags) */}
+              <div className="flex flex-col md:items-end gap-4 shrink-0">
+                
+                {/* Date and Read Time - FORCED INLINE */}
+                <div className="text-xs text-gray-500 md:text-right w-full whitespace-nowrap">
+                  {selectedPost.attributes.date}
+                  <span className="mx-3 text-gray-700">·</span>
+                  {selectedPost.attributes.readTime}
+                </div>
+                
+                {/* Tags Array */}
                 {selectedPost.attributes.tags && (
-                  <div className="flex gap-2 mt-4 flex-wrap">
+                  <div className="flex gap-2 flex-wrap md:justify-end max-w-[250px]">
                     {selectedPost.attributes.tags.map(tag => (
                       <span key={tag} className="text-[10px] uppercase tracking-widest text-brand-green border border-brand-green/30 px-2 py-0.5 bg-brand-green/10">
                         #{tag}
@@ -147,10 +187,6 @@ export default function App() {
                     ))}
                   </div>
                 )}
-
-              <div className="flex md:flex-col gap-4 md:gap-1 text-xs text-gray-500 text-left md:text-right">
-                <span>{selectedPost.attributes.date}</span>
-                <span>{selectedPost.attributes.readTime}</span>
               </div>
             </div>
 
@@ -176,7 +212,6 @@ export default function App() {
                   }
                 }}
               >
-                {/* Strips out the leading # H1 line from the markdown body text */}
                 {selectedPost.body.trimStart().replace(/^#\s+.*[\r\n]+/, '')}
               </ReactMarkdown>
             </div>
@@ -208,7 +243,7 @@ export default function App() {
                   {post.attributes.excerpt}
                 </p>
 
-                {/* NEW: Render Tags in the Feed */}
+                {/* Render Tags in the Feed */}
                 {post.attributes.tags && (
                   <div className="flex gap-2 mb-6 flex-wrap">
                     {post.attributes.tags.map(tag => (
@@ -229,7 +264,7 @@ export default function App() {
           <div className="border border-gray-800 bg-brutal-panel p-8 text-gray-300 leading-relaxed text-sm space-y-4">
             <h2 className="text-xl font-bold text-white">About CTRL+ALT+BUILD</h2>
             <p>
-              This site is a transparent public build log created to document progress, share engineering insights, and record practical evidence as projects move from concept to execution.
+              This site is a mixture of microblogging, learning how stuff works - and a distraction from the repetitive nature of applying for jobs.  I needed some way to build and learn while tackling a job search, and this is it.  It's not meant to be a live CV, a demomstration of my coding prowess or a guide to life, the universe and everything.  If it helps anyone with their job search, or even getting started building things - happy days.
             </p>
           </div>
         )}
