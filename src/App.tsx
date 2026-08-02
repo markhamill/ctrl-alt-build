@@ -199,14 +199,20 @@ export default function App() {
                   a: ({node, ...props}) => <a className="text-brand-orange hover:underline" {...props} />,
                   ul: ({node, ...props}) => <ul className="list-disc list-inside mb-4 space-y-2 text-gray-400" {...props} />,
                   li: ({node, ...props}) => <li {...props} />,
-                  code: ({node, inline, className, children, ...props}: any) => {
-                    return inline ? (
+                  code: ({node, className, children, ...props}: any) => {
+                    // Check for a language tag or a multiline string to identify block-level code
+                    const match = /language-(\w+)/.exec(className || '')
+                    const isBlock = match || String(children).includes('\n')
+                    
+                    return !isBlock ? (
+                      // INLINE CODE
                       <code className="bg-black text-brand-green px-1.5 py-0.5 rounded text-sm border border-gray-800" {...props}>
                         {children}
                       </code>
                     ) : (
+                      // BLOCK CODE
                       <pre className="bg-black text-brand-green p-4 overflow-x-auto border border-gray-800 my-6 text-sm">
-                        <code {...props}>{children}</code>
+                        <code className={className} {...props}>{children}</code>
                       </pre>
                     )
                   }
