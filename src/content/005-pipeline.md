@@ -55,7 +55,7 @@ Once the articles were loading, I hit a snag. In modern Single Page Applications
 
 *Question: "If the URL never changes, how do I use the browser's back button, or share a link to a specific article?"*
 
-**The Answer:** Hash Routing. We injected a small script to update the URL with a `#` (like `/#dispatch-001`) whenever an article is clicked. 
+**The Answer:** Hash Routing. We injected a small script to update the URL with a `#` (like `/#note-001`) whenever an article is clicked. 
 Because GitHub's servers ignore everything after a hash, if someone refreshes the page, GitHub doesn't throw a 404 error. The React app loads, reads the hash, and instantly displays the correct article.
 
 ## Step 5: The Deployment Pipeline

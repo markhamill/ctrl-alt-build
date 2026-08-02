@@ -19,7 +19,7 @@ interface Post {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'dispatches' | 'about'>('dispatches')
+  const [activeTab, setActiveTab] = useState<'notes' | 'about'>('notes')
   const [posts, setPosts] = useState<Post[]>([])
   const [selectedPost, setSelectedPost] = useState<Post | null>(null)
 
@@ -55,19 +55,19 @@ export default function App() {
     const handleHashChange = () => {
       const hash = window.location.hash
       
-      if (hash.startsWith('#dispatch-')) {
-        const slug = hash.replace('#dispatch-', '')
+      if (hash.startsWith('#note-') || hash.startsWith('#dispatch-')) {
+        const slug = hash.replace('#note-', '').replace('#dispatch-', '')
         const post = posts.find(p => p.slug === slug)
         if (post) {
           setSelectedPost(post)
-          setActiveTab('dispatches')
+          setActiveTab('notes')
         }
       } else if (hash === '#about') {
         setSelectedPost(null)
         setActiveTab('about')
       } else {
         setSelectedPost(null)
-        setActiveTab('dispatches')
+        setActiveTab('notes')
       }
     }
 
@@ -93,7 +93,7 @@ export default function App() {
       <header className="border-b border-gray-800 pb-6 mb-8 flex justify-between items-end">
         <div>
           <p className="text-gray-500 text-xs tracking-widest uppercase mb-2">
-            Dispatches from a journey of job searching in the AI era · Est. Jul 2026
+            Notes from a journey of job searching in the AI era · Est. Jul 2026
           </p>
           <h1 className="text-5xl md:text-7xl font-black tracking-tighter cursor-pointer" onClick={() => window.location.hash = ''}>
             CTRL+ALT+<span className="text-brand-orange">BUILD</span>
@@ -108,7 +108,7 @@ export default function App() {
         </div>
       </header>
 
-{/* NAVIGATION */}
+      {/* NAVIGATION */}
       {selectedPost ? (
         <nav className="flex justify-between border-b border-gray-800/80 pb-4 mb-8 text-xs tracking-widest uppercase">
           <button 
@@ -121,18 +121,18 @@ export default function App() {
           {/* NEXT / PREVIOUS ARROWS */}
           <div className="flex gap-6 font-bold">
             <button 
-              onClick={() => newerPost && (window.location.hash = `dispatch-${newerPost.slug}`)}
+              onClick={() => newerPost && (window.location.hash = `note-${newerPost.slug}`)}
               disabled={!newerPost}
               className={`flex items-center transition-colors ${newerPost ? 'text-brand-orange/60 hover:text-brand-orange cursor-pointer' : 'text-gray-800 cursor-default'}`}
-              title={newerPost ? "Newer Dispatch" : ""}
+              title={newerPost ? "Newer Note" : ""}
             >
               NEWER ↑
             </button>
             <button 
-              onClick={() => olderPost && (window.location.hash = `dispatch-${olderPost.slug}`)}
+              onClick={() => olderPost && (window.location.hash = `note-${olderPost.slug}`)}
               disabled={!olderPost}
               className={`flex items-center transition-colors ${olderPost ? 'text-brand-orange/60 hover:text-brand-orange cursor-pointer' : 'text-gray-800 cursor-default'}`}
-              title={olderPost ? "Older Dispatch" : ""}
+              title={olderPost ? "Older Note" : ""}
             >
               OLDER ↓
             </button>
@@ -142,9 +142,9 @@ export default function App() {
         <nav className="flex gap-6 border-b border-gray-800/80 pb-4 mb-8 text-xs tracking-widest uppercase">
           <button 
             onClick={() => window.location.hash = ''}
-            className={`transition-colors ${activeTab === 'dispatches' ? 'text-brand-orange font-bold border-b-2 border-brand-orange pb-4 -mb-4' : 'text-gray-500 hover:text-gray-300'}`}
+            className={`transition-colors ${activeTab === 'notes' ? 'text-brand-orange font-bold border-b-2 border-brand-orange pb-4 -mb-4' : 'text-gray-500 hover:text-gray-300'}`}
           >
-            // DISPATCHES ({posts.length})
+            // NOTES ({posts.length})
           </button>
           <button 
             onClick={() => window.location.hash = 'about'}
@@ -226,12 +226,12 @@ export default function App() {
               </ReactMarkdown>
             </div>
           </article>
-        ) : activeTab === 'dispatches' ? (
+        ) : activeTab === 'notes' ? (
           <div className="space-y-6">
             {posts.map((post) => (
               <article 
                 key={post.attributes.id} 
-                onClick={() => window.location.hash = `dispatch-${post.slug}`}
+                onClick={() => window.location.hash = `note-${post.slug}`}
                 className="group border border-gray-800/80 bg-brutal-panel p-6 rounded-none hover:border-brand-orange/50 transition-all duration-200 cursor-pointer"
               >
                 <div className="text-xs mb-3">
@@ -266,7 +266,7 @@ export default function App() {
                 )}
 
                 <div className="text-xs text-gray-500 group-hover:text-gray-300 flex items-center gap-1 font-semibold">
-                  READ DISPATCH <span className="text-brand-orange">→</span>
+                  READ NOTE <span className="text-brand-orange">→</span>
                 </div>
               </article>
             ))}

@@ -46,6 +46,6 @@ useEffect(() => {
 }, [selectedPost, activeTab])
 ```
 
-Second, the URL slugs were originally derived from the physical local filenames (e.g., `006-draft.md`). By mapping the slug generation to the `id` field in the YAML frontmatter instead, the routing engine now enforces a pristine `/#dispatch-006` format, completely decoupled from the local filesystem conventions.
+Second, the URL slugs were originally derived from the physical local filenames (e.g., `006-draft.md`). By mapping the slug generation to the `id` field in the YAML frontmatter instead, the routing engine now enforces a pristine `/#note-006` format, completely decoupled from the local filesystem conventions.
 
 Next up: getting back to the backend systems now that the presentation layer is locked in.

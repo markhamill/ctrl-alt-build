@@ -11,8 +11,8 @@ This repository contains "CTRL-ALT-BUILD," a public build log and technical diar
 - **CI/CD:** GitHub Actions (configured via `.github/workflows/deploy.yml`)
 
 ## Core Architecture Decisions
-1. **The Content Pipeline:** There is no database. Dispatches are written as standard `.md` files stored in `src/content/`. Vite dynamically scrapes this directory using `import.meta.glob`, parses the frontmatter, and renders the feed.
-2. **Hash Routing:** To maintain SPA speed while surviving GitHub Pages' static file limitations (avoiding 404s on refresh), all navigation is handled via hash routing (e.g., `/#dispatch-003`). Do not implement `react-router-dom` or server-side routing.
+1. **The Content Pipeline:** There is no database. Notes are written as standard `.md` files stored in `src/content/`. Vite dynamically scrapes this directory using `import.meta.glob`, parses the frontmatter, and renders the feed.
+2. **Hash Routing:** To maintain SPA speed while surviving GitHub Pages' static file limitations (avoiding 404s on refresh), all navigation is handled via hash routing (e.g., `/#note-003`). Do not implement `react-router-dom` or server-side routing.
 3. **Brutalist UI:** The design system relies on a pitch-black background (`#0a0a0a`), signature orange (`#ff4a00`), neon green highlights, and strict monospaced typography (`font-mono`). Components are boxy, heavily bordered, and high-contrast. Avoid soft shadows, rounded corners, or gradients.
 
 ## Immediate Next Steps (Session Context)
