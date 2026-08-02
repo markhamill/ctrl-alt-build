@@ -9,6 +9,7 @@ interface PostAttributes {
   title: string
   excerpt: string
   readTime: string
+  tags?: string[] // NEW: Optional tags array
 }
 
 interface Post {
@@ -135,6 +136,18 @@ export default function App() {
                   {selectedPost.attributes.title}
                 </h1>
               </div>
+
+                {/* NEW: Render Tags in Article Header */}
+                {selectedPost.attributes.tags && (
+                  <div className="flex gap-2 mt-4 flex-wrap">
+                    {selectedPost.attributes.tags.map(tag => (
+                      <span key={tag} className="text-[10px] uppercase tracking-widest text-brand-green border border-brand-green/30 px-2 py-0.5 bg-brand-green/10">
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
               <div className="flex md:flex-col gap-4 md:gap-1 text-xs text-gray-500 text-left md:text-right">
                 <span>{selectedPost.attributes.date}</span>
                 <span>{selectedPost.attributes.readTime}</span>
@@ -163,7 +176,8 @@ export default function App() {
                   }
                 }}
               >
-                {selectedPost.body}
+                {/* Strips out the leading # H1 line from the markdown body text */}
+                {selectedPost.body.trimStart().replace(/^#\s+.*[\r\n]+/, '')}
               </ReactMarkdown>
             </div>
           </article>
@@ -193,6 +207,17 @@ export default function App() {
                 <p className="text-gray-400 text-sm leading-relaxed mb-4">
                   {post.attributes.excerpt}
                 </p>
+
+                {/* NEW: Render Tags in the Feed */}
+                {post.attributes.tags && (
+                  <div className="flex gap-2 mb-6 flex-wrap">
+                    {post.attributes.tags.map(tag => (
+                      <span key={tag} className="text-[10px] uppercase tracking-widest text-gray-500 border border-gray-800 px-2 py-0.5 group-hover:border-brand-green/50 group-hover:text-brand-green transition-colors">
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
                 <div className="text-xs text-gray-500 group-hover:text-gray-300 flex items-center gap-1 font-semibold">
                   READ DISPATCH <span className="text-brand-orange">→</span>
