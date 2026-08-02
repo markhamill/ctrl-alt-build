@@ -93,7 +93,7 @@ export default function App() {
       <header className="border-b border-gray-800 pb-6 mb-8 flex justify-between items-end">
         <div>
           <p className="text-gray-500 text-xs tracking-widest uppercase mb-2">
-            Notes from a journey of job searching in the AI era · Est. Jul 2026
+            Notes from job searching in the AI era · Est. Jul 2026
           </p>
           <h1 className="text-5xl md:text-7xl font-black tracking-tighter cursor-pointer" onClick={() => window.location.hash = ''}>
             CTRL+ALT+<span className="text-brand-orange">BUILD</span>
@@ -199,6 +199,8 @@ export default function App() {
                 components={{
                   h1: ({node, ...props}) => <h2 className="text-2xl font-bold text-white mt-10 mb-4" {...props} />,
                   h2: ({node, ...props}) => <h3 className="text-xl font-bold text-white mt-8 mb-4" {...props} />,
+                  h3: ({node, ...props}) => <h4 className="text-lg font-bold text-white mt-6 mb-3" {...props} />,
+                  h4: ({node, ...props}) => <h5 className="text-base font-bold text-white mt-4 mb-2" {...props} />,
                   p: ({node, ...props}) => <p className="mb-4" {...props} />,
                   a: ({node, ...props}) => <a className="text-brand-orange hover:underline" {...props} />,
                   ul: ({node, ...props}) => <ul className="list-disc list-inside mb-4 space-y-2 text-gray-400" {...props} />,
