@@ -17,4 +17,4 @@ This repository contains "CTRL-ALT-BUILD," a public build log and technical diar
 
 ## Immediate Next Steps (Session Context)
 - **Security Update:** The local `.git/config` is currently using a plaintext Personal Access Token (PAT) for remote authentication. The immediate next task is to generate an SSH key, associate it with the GitHub account, update the remote URL to `git@github.com:markhamill/ctrl-alt-build.git`, and revoke/delete the PAT.
-- **Backlog:** A 6-card metrics dashboard layout (Applied, Interviews, Rejections, etc.) was originally planned for the top of the feed but has been intentionally deferred to the "long grass." Focus should remain on content engine integrity and pipeline security first.
+- **Metrics Dashboard:** Implemented top-row 6-card metrics dashboard (Applied, Interviews, Rejections, Ghosted, Offers, In Flight) and header counter driven by `src/data/stats.json`.

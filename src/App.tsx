@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import frontMatter from 'front-matter'
 import ReactMarkdown from 'react-markdown'
+import statsData from './data/stats.json'
+import MoraleChart from './components/MoraleChart'
 
 interface PostAttributes {
   id: string
@@ -19,7 +21,7 @@ interface Post {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'notes' | 'about'>('notes')
+  const [activeTab, setActiveTab] = useState<'home' | 'notes' | 'about'>('home')
   const [posts, setPosts] = useState<Post[]>([])
   const [selectedPost, setSelectedPost] = useState<Post | null>(null)
 
@@ -60,14 +62,16 @@ export default function App() {
         const post = posts.find(p => p.slug === slug)
         if (post) {
           setSelectedPost(post)
-          setActiveTab('notes')
         }
+      } else if (hash === '#notes') {
+        setSelectedPost(null)
+        setActiveTab('notes')
       } else if (hash === '#about') {
         setSelectedPost(null)
         setActiveTab('about')
       } else {
         setSelectedPost(null)
-        setActiveTab('notes')
+        setActiveTab('home')
       }
     }
 
@@ -86,6 +90,68 @@ export default function App() {
   const newerPost = currentIndex > 0 ? posts[currentIndex - 1] : null
   const olderPost = currentIndex !== -1 && currentIndex < posts.length - 1 ? posts[currentIndex + 1] : null
 
+  // Calculate dynamic days since start date
+  const startDay = new Date(statsData.startDate)
+  const today = new Date()
+  startDay.setHours(0, 0, 0, 0)
+  today.setHours(0, 0, 0, 0)
+  const daysBuilding = Math.max(1, Math.floor((today.getTime() - startDay.getTime()) / (1000 * 60 * 60 * 24)) + 1)
+
+  const dashboardCards = [
+    { label: 'PROJECTS', value: statsData.cards.projects },
+    { label: 'NOTES', value: posts.length },
+    { label: 'TOOLS', value: statsData.cards.tools },
+    { label: 'TALKS', value: statsData.cards.talks },
+    { label: 'JOBS', value: statsData.cards.jobs }
+  ]
+
+  const renderPostsList = () => (
+    <>
+      {posts.map((post) => (
+        <article 
+          key={post.attributes.id} 
+          onClick={() => window.location.hash = `note-${post.slug}`}
+          className="group border border-gray-800/80 bg-brutal-panel p-6 rounded-none hover:border-brand-orange/50 transition-all duration-200 cursor-pointer"
+        >
+          <div className="text-xs mb-3">
+            <span className="text-brand-orange font-semibold tracking-wider">
+              [{post.attributes.category}]
+            </span>
+          </div>
+
+          <h2 className="text-2xl font-bold text-white group-hover:text-brand-orange transition-colors mb-2">
+            {post.attributes.title}
+          </h2>
+
+          <div className="flex gap-4 text-xs text-gray-500 mb-3">
+            <span>{post.attributes.date}</span>
+            <span>·</span>
+            <span>{post.attributes.readTime}</span>
+          </div>
+
+          <p className="text-gray-400 text-sm leading-relaxed mb-4">
+            {post.attributes.excerpt}
+          </p>
+
+          {/* Render Tags in the Feed */}
+          {post.attributes.tags && (
+            <div className="flex gap-2 mb-6 flex-wrap">
+              {post.attributes.tags.map(tag => (
+                <span key={tag} className="text-[10px] uppercase tracking-widest text-gray-500 border border-gray-800 px-2 py-0.5 group-hover:border-brand-green/50 group-hover:text-brand-green transition-colors">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="text-xs text-gray-500 group-hover:text-gray-300 flex items-center gap-1 font-semibold">
+            READ NOTE <span className="text-brand-orange">→</span>
+          </div>
+        </article>
+      ))}
+    </>
+  )
+
   return (
     <div className="min-h-screen bg-brutal-bg text-gray-200 font-mono p-6 md:p-12 selection:bg-brand-orange selection:text-white max-w-5xl mx-auto">
       
@@ -93,7 +159,7 @@ export default function App() {
       <header className="border-b border-gray-800 pb-6 mb-8 flex justify-between items-end">
         <div>
           <p className="text-gray-500 text-xs tracking-widest uppercase mb-2">
-            Notes from job searching in the AI era · Est. Jul 2026
+            Notes from job searching in the AI era
           </p>
           <h1 className="text-5xl md:text-7xl font-black tracking-tighter cursor-pointer" onClick={() => window.location.hash = ''}>
             CTRL+ALT+<span className="text-brand-orange">BUILD</span>
@@ -139,19 +205,31 @@ export default function App() {
           </div>
         </nav>
       ) : (
-        <nav className="flex gap-6 border-b border-gray-800/80 pb-4 mb-8 text-xs tracking-widest uppercase">
-          <button 
-            onClick={() => window.location.hash = ''}
-            className={`transition-colors ${activeTab === 'notes' ? 'text-brand-orange font-bold border-b-2 border-brand-orange pb-4 -mb-4' : 'text-gray-500 hover:text-gray-300'}`}
-          >
-            // NOTES ({posts.length})
-          </button>
-          <button 
-            onClick={() => window.location.hash = 'about'}
-            className={`transition-colors ${activeTab === 'about' ? 'text-brand-orange font-bold border-b-2 border-brand-orange pb-4 -mb-4' : 'text-gray-500 hover:text-gray-300'}`}
-          >
-            // ABOUT THE PROJECT
-          </button>
+        <nav className="flex justify-between items-center border-b border-gray-800/80 pb-4 mb-8 text-xs tracking-widest uppercase">
+          <div className="flex gap-6">
+            <button 
+              onClick={() => window.location.hash = ''}
+              className={`transition-colors ${activeTab === 'home' ? 'text-brand-orange font-bold border-b-2 border-brand-orange pb-4 -mb-4' : 'text-gray-500 hover:text-gray-300'}`}
+            >
+              // HOME
+            </button>
+            <button 
+              onClick={() => window.location.hash = 'notes'}
+              className={`transition-colors ${activeTab === 'notes' ? 'text-brand-orange font-bold border-b-2 border-brand-orange pb-4 -mb-4' : 'text-gray-500 hover:text-gray-300'}`}
+            >
+              // NOTES ({posts.length})
+            </button>
+            <button 
+              onClick={() => window.location.hash = 'about'}
+              className={`transition-colors ${activeTab === 'about' ? 'text-brand-orange font-bold border-b-2 border-brand-orange pb-4 -mb-4' : 'text-gray-500 hover:text-gray-300'}`}
+            >
+              // ABOUT THE PROJECT
+            </button>
+          </div>
+
+          <div className="text-gray-500 font-medium hidden sm:block">
+            DAY <span className="text-white font-bold">{daysBuilding}</span> OF BUILDING
+          </div>
         </nav>
       )}
 
@@ -228,50 +306,32 @@ export default function App() {
               </ReactMarkdown>
             </div>
           </article>
+        ) : activeTab === 'home' ? (
+          <div className="space-y-6">
+            {/* DASHBOARD METRICS CARDS (COMPACT HORIZONTAL SCROLL) */}
+            <div className="w-full overflow-x-auto border border-gray-800/80 bg-brutal-panel mb-4">
+              <div className="grid grid-cols-5 min-w-[600px] divide-x divide-gray-800/80">
+                {dashboardCards.map((card) => (
+                  <div key={card.label} className="px-4 py-2 flex items-baseline gap-2 justify-start">
+                    <span className="text-xl font-black text-white tracking-tight font-mono">
+                      {card.value}
+                    </span>
+                    <span className="text-[10px] tracking-widest uppercase text-gray-500 font-semibold truncate">
+                      {card.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* MOOD TREND LINE CHART */}
+            <MoraleChart />
+
+            {renderPostsList()}
+          </div>
         ) : activeTab === 'notes' ? (
           <div className="space-y-6">
-            {posts.map((post) => (
-              <article 
-                key={post.attributes.id} 
-                onClick={() => window.location.hash = `note-${post.slug}`}
-                className="group border border-gray-800/80 bg-brutal-panel p-6 rounded-none hover:border-brand-orange/50 transition-all duration-200 cursor-pointer"
-              >
-                <div className="text-xs mb-3">
-                  <span className="text-brand-orange font-semibold tracking-wider">
-                    [{post.attributes.category}]
-                  </span>
-                </div>
-
-                <h2 className="text-2xl font-bold text-white group-hover:text-brand-orange transition-colors mb-2">
-                  {post.attributes.title}
-                </h2>
-
-                <div className="flex gap-4 text-xs text-gray-500 mb-3">
-                  <span>{post.attributes.date}</span>
-                  <span>·</span>
-                  <span>{post.attributes.readTime}</span>
-                </div>
-
-                <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                  {post.attributes.excerpt}
-                </p>
-
-                {/* Render Tags in the Feed */}
-                {post.attributes.tags && (
-                  <div className="flex gap-2 mb-6 flex-wrap">
-                    {post.attributes.tags.map(tag => (
-                      <span key={tag} className="text-[10px] uppercase tracking-widest text-gray-500 border border-gray-800 px-2 py-0.5 group-hover:border-brand-green/50 group-hover:text-brand-green transition-colors">
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <div className="text-xs text-gray-500 group-hover:text-gray-300 flex items-center gap-1 font-semibold">
-                  READ NOTE <span className="text-brand-orange">→</span>
-                </div>
-              </article>
-            ))}
+            {renderPostsList()}
           </div>
         ) : (
           <div className="border border-gray-800 bg-brutal-panel p-8 text-gray-300 leading-relaxed text-sm space-y-4">
