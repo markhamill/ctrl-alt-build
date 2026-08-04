@@ -223,7 +223,7 @@ export default function App() {
               onClick={() => window.location.hash = 'about'}
               className={`transition-colors ${activeTab === 'about' ? 'text-brand-orange font-bold border-b-2 border-brand-orange pb-4 -mb-4' : 'text-gray-500 hover:text-gray-300'}`}
             >
-              // ABOUT THE PROJECT
+              // ABOUT
             </button>
           </div>
 
